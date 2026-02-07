@@ -13,6 +13,7 @@
         /* Dashboard */
         .dashboard { display: flex; gap: 10px; margin-bottom: 20px; }
         .card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card.asset { background: #fff3cd; color: #856404; }
         .card.inc { background: #d4edda; color: #155724; }
         .card.exp { background: #f8d7da; color: #721c24; }
         .card.balance { background: #cce5ff; color: #004085; }
@@ -43,6 +44,7 @@
         
         .t-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;}
         .t-amount { font-weight: bold; font-size: 1.1rem; }
+        .t-amount.asset { color: #d4a017; }
         .t-amount.inc { color: #28a745; }
         .t-amount.exp { color: #dc3545; }
         
@@ -92,6 +94,10 @@
     <h1>RNU Wallet</h1>
 
     <div class="dashboard">
+        <div class="card asset">
+            <h3>Asset</h3>
+            <p id="total-asset">0.00 AED</p>
+        </div>
         <div class="card inc">
             <h3>Income</h3>
             <p id="total-inc">0.00 AED</p>
@@ -118,8 +124,9 @@
             <input type="date" id="t-date" required>
             
             <select id="type">
-                <option value="expense">Expense (-)</option>
+                <option value="asset">Asset (+)</option>
                 <option value="income">Income (+)</option>
+                <option value="expense">Expense (-)</option>
             </select>
             
             <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
@@ -324,18 +331,22 @@
         function updateUI() {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
-            let inc = 0, exp = 0;
+            let asset = 0, inc = 0, exp = 0;
 
             // Sort by Date (Newest first)
             transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             transactions.forEach((t, index) => {
                 const amount = parseFloat(t.amount);
-                if(t.type === 'income') inc += amount; else exp += amount;
+                if(t.type === 'asset') asset += amount;
+                else if(t.type === 'income') inc += amount;
+                else exp += amount;
 
                 // Handle old data that might not have a category or date
                 const displayDate = t.date ? formatDate(t.date) : 'No Date';
                 const displayCat = t.category ? t.category : 'Uncategorized';
+                const typeClass = t.type === 'asset' ? 'asset' : (t.type === 'income' ? 'inc' : 'exp');
+                const sign = (t.type === 'asset' || t.type === 'income') ? '+' : '-';
 
                 const item = document.createElement('div');
                 item.className = 'transaction';
@@ -348,17 +359,18 @@
                         </div>
                     </div>
                     <div class="t-right">
-                        <span class="t-amount ${t.type === 'income'?'inc':'exp'}">
-                            ${t.type==='income'?'+':'-'}${formatAmount(amount)} AED
+                        <span class="t-amount ${typeClass}">
+                            ${sign}${formatAmount(amount)} AED
                         </span>
                     </div>`;
                 list.appendChild(item);
             });
 
+            document.getElementById('total-asset').innerText = `${formatAmount(asset)} AED`;
             document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
             document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
 
-            const balance = inc - exp;
+            const balance = asset + inc - exp;
             const balanceEl = document.getElementById('total-balance');
             const balanceCard = document.getElementById('balance-card');
             balanceEl.innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
@@ -370,7 +382,7 @@
                 const cat = (t.category || '').trim() || 'Uncategorized';
                 const amt = parseFloat(t.amount);
                 if (!categoryTotals[cat]) categoryTotals[cat] = 0;
-                categoryTotals[cat] += t.type === 'income' ? amt : -amt;
+                categoryTotals[cat] += (t.type === 'asset' || t.type === 'income') ? amt : -amt;
             });
             const categoryList = document.getElementById('category-list');
             categoryList.innerHTML = '';
