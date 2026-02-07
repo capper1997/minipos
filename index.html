@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="GitWallet">
+    <title>GitHub Wallet</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f4f4f7; margin: 0; padding: 20px; color: #333; padding-bottom: 80px; }
+        h1 { text-align: center; font-size: 1.2rem; color: #555; }
+        
+        /* Dashboard */
+        .dashboard { display: flex; gap: 10px; margin-bottom: 20px; }
+        .card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card.inc { background: #d4edda; color: #155724; }
+        .card.exp { background: #f8d7da; color: #721c24; }
+        .card p { margin: 5px 0 0; font-size: 1.2rem; font-weight: bold; }
+
+        /* Inputs */
+        .input-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        
+        /* List */
+        .transaction { background: white; padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .t-amount.inc { color: #28a745; }
+        .t-amount.exp { color: #dc3545; }
+        .del-btn { color: #aaa; padding: 0 10px; font-size: 1.5rem; cursor: pointer; }
+
+        /* Settings Modal */
+        #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; }
+        .modal-content { background: white; margin: 50px 20px; padding: 20px; border-radius: 15px; }
+        .settings-btn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* Status Bar */
+        #status-bar { text-align: center; font-size: 0.8rem; margin-bottom: 10px; color: #666; height: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="status-bar">Connecting...</div>
+    <h1>My GitWallet</h1>
+
+    <div class="dashboard">
+        <div class="card inc"><h3>Income</h3><p id="total-inc">$0.00</p></div>
+        <div class="card exp"><h3>Expense</h3><p id="total-exp">$0.00</p></div>
+    </div>
+
+    <div class="input-group">
+        <select id="type"><option value="expense">Expense</option><option value="income">Income</option></select>
+        <input type="text" id="desc" placeholder="Item (e.g. Coffee)" required>
+        <input type="number" id="amount" placeholder="Amount" step="0.01" required>
+        <button id="add-btn" onclick="addTransaction()">Add Transaction</button>
+    </div>
+
+    <div id="history-list"></div>
+
+    <div class="settings-btn" onclick="toggleSettings()">⚙</div>
+
+    <div id="settings-modal">
+        <div class="modal-content">
+            <h2>GitHub Setup</h2>
+            <p style="font-size:0.9rem; color:#666;">Enter your details to sync data.</p>
+            <input type="text" id="gh-username" placeholder="GitHub Username">
+            <input type="text" id="gh-repo" placeholder="Repository Name">
+            <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
+            <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
+            <button onclick="saveSettings()">Save & Sync</button>
+            <button onclick="toggleSettings()" style="background:#666; margin-top:10px;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let transactions = [];
+        let fileSha = null; // Required by GitHub API to update files
+
+        // Load settings from local storage
+        const getSetting = (key) => localStorage.getItem(key);
+        
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+            
+            if(modal.style.display === 'block') {
+                document.getElementById('gh-username').value = getSetting('gh_username') || '';
+                document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
+                document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
+                document.getElementById('gh-token').value = getSetting('gh_token') || '';
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('gh_username', document.getElementById('gh-username').value);
+            localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
+            localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
+            localStorage.setItem('gh_token', document.getElementById('gh-token').value);
+            toggleSettings();
+            loadFromGitHub();
+        }
+
+        function showStatus(msg) { document.getElementById('status-bar').innerText = msg; }
+
+        async function loadFromGitHub() {
+            const user = getSetting('gh_username');
+            const repo = getSetting('gh_repo');
+            const file = getSetting('gh_filename');
+            const token = getSetting('gh_token');
+
+            if (!user || !repo || !token) {
+                showStatus('Tap ⚙ to setup GitHub sync');
+                return;
+            }
+
+            showStatus('Fetching data from GitHub...');
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+
+                if (response.status === 404) {
+                    showStatus('No data file yet. Add first item.');
+                    transactions = [];
+                } else if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.sha; // Save SHA for next update
+                    // Decode Base64 content
+                    const content = decodeURIComponent(escape(atob(data.content)));
+                    transactions = JSON.parse(content);
+                    showStatus('Synced');
+                } else {
+                    showStatus('Error fetching data');
+                }
+                updateUI();
+            } catch (e) {
+                showStatus('Connection Error');
+                console.error(e);
+            }
+        }
+
+        async function saveToGitHub() {
+            const user = getSetting('gh_username');
+            const repo = getSetting('gh_repo');
+            const file = getSetting('gh_filename');
+            const token = getSetting('gh_token');
+            
+            showStatus('Saving to GitHub...');
+            document.getElementById('add-btn').disabled = true;
+
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(transactions)))); // Encode to Base64
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
+
+            const body = {
+                message: "Update wallet data",
+                content: content
+            };
+            if (fileSha) body.sha = fileSha; // Include SHA if updating existing file
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `token ${token}`, 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.content.sha; // Update SHA
+                    showStatus('Saved successfully!');
+                } else {
+                    showStatus('Save Failed! Check Settings.');
+                }
+            } catch (e) {
+                showStatus('Save Error');
+            }
+            document.getElementById('add-btn').disabled = false;
+        }
+
+        function updateUI() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            let inc = 0, exp = 0;
+
+            transactions.forEach((t, index) => {
+                const amount = parseFloat(t.amount);
+                if(t.type === 'income') inc += amount; else exp += amount;
+
+                const item = document.createElement('div');
+                item.className = 'transaction';
+                item.innerHTML = `
+                    <div><strong>${t.desc}</strong></div>
+                    <div style="display:flex;align-items:center;">
+                        <span class="t-amount ${t.type === 'income'?'inc':'exp'}">${t.type==='income'?'+':'-'}$${amount}</span>
+                        <span class="del-btn" onclick="removeTransaction(${index})">&times;</span>
+                    </div>`;
+                list.prepend(item);
+            });
+
+            document.getElementById('total-inc').innerText = `$${inc.toFixed(2)}`;
+            document.getElementById('total-exp').innerText = `$${exp.toFixed(2)}`;
+        }
+
+        function addTransaction() {
+            const desc = document.getElementById('desc').value;
+            const amount = document.getElementById('amount').value;
+            if(!desc || !amount) return alert('Fill all fields');
+
+            transactions.push({
+                type: document.getElementById('type').value,
+                desc,
+                amount
+            });
+
+            updateUI();
+            saveToGitHub(); // Sync immediately
+            
+            document.getElementById('desc').value = '';
+            document.getElementById('amount').value = '';
+        }
+
+        function removeTransaction(index) {
+            if(confirm('Delete?')) {
+                transactions.splice(index, 1);
+                updateUI();
+                saveToGitHub();
+            }
+        }
+
+        // Init
+        loadFromGitHub();
+    </script>
+</body>
+</html>
