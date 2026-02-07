@@ -61,10 +61,33 @@
         .category-item .cat-amount { font-weight: bold; font-size: 0.95rem; margin-top: 4px; }
         .category-item .cat-amount.positive { color: #28a745; }
         .category-item .cat-amount.negative { color: #dc3545; }
+
+        /* Login */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f7; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 2000; }
+        #login-screen.hidden { display: none; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 320px; }
+        .login-box h2 { margin: 0 0 20px; text-align: center; font-size: 1.3rem; color: #333; }
+        .login-box input { margin-bottom: 15px; }
+        .login-error { color: #dc3545; font-size: 0.85rem; margin-bottom: 10px; text-align: center; }
+        #app { display: none; }
+        #app.visible { display: block; }
     </style>
 </head>
 <body>
 
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>RNU Wallet</h2>
+            <p class="login-error" id="login-error"></p>
+            <form onsubmit="doLogin(); return false;">
+                <input type="text" id="login-username" placeholder="Username" autocomplete="username">
+                <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app">
     <div id="status-bar">Connecting...</div>
     <h1>RNU Wallet</h1>
 
@@ -90,7 +113,7 @@
         <div id="category-list"></div>
     </div>
 
-    <div class="input-group">
+    <div class="input-group" id="add-transaction-form">
         <form id="tx-form" onsubmit="addTransaction(); return false;">
             <input type="date" id="t-date" required>
             
@@ -126,13 +149,50 @@
             <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
             <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
             <button onclick="saveSettings()">Save & Sync</button>
+            <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
             <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
         </div>
     </div>
 
+    </div><!-- end #app -->
+
     <script>
         let transactions = [];
         let fileSha = null;
+
+        // --- Auth ---
+        const USERS = { safar: 'safar1997', renu: 'renu' };
+        const getCurrentUser = () => sessionStorage.getItem('wallet_user');
+        const setCurrentUser = (u) => { if(u) sessionStorage.setItem('wallet_user', u); else sessionStorage.removeItem('wallet_user'); };
+
+        function doLogin() {
+            const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
+            const p = document.getElementById('login-password').value;
+            const err = document.getElementById('login-error');
+            if (!USERS[u] || USERS[u] !== p) {
+                err.textContent = 'Invalid username or password';
+                return;
+            }
+            err.textContent = '';
+            setCurrentUser(u);
+            showApp();
+        }
+
+        function logout() {
+            setCurrentUser('');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app').classList.remove('visible');
+            toggleSettings();
+        }
+
+        function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app').classList.add('visible');
+            const isRenu = getCurrentUser() === 'renu';
+            document.getElementById('add-transaction-form').style.display = isRenu ? 'none' : 'block';
+        }
 
         // --- Helpers ---
         const getSetting = (key) => localStorage.getItem(key);
@@ -354,7 +414,10 @@
         }
 
         // Initialize
-        setToday(); // Set date picker to today
+        if (getCurrentUser()) {
+            showApp();
+        }
+        setToday();
         loadFromGitHub();
     </script>
 </body>
