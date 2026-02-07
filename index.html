@@ -109,7 +109,7 @@
     </div>
     <div class="dashboard">
         <div class="card balance" id="balance-card">
-            <h3>Balance</h3>
+            <h3>Cash Balance</h3>
             <p id="total-balance">0.00 AED</p>
         </div>
     </div>
@@ -370,7 +370,7 @@
             document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
             document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
 
-            const balance = asset + inc - exp;
+            const balance = inc - exp;
             const balanceEl = document.getElementById('total-balance');
             const balanceCard = document.getElementById('balance-card');
             balanceEl.innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
