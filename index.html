@@ -80,22 +80,24 @@
     </div>
 
     <div class="input-group">
-        <input type="date" id="t-date" required>
-        
-        <select id="type">
-            <option value="expense">Expense (-)</option>
-            <option value="income">Income (+)</option>
-        </select>
-        
-        <input type="text" id="desc" placeholder="Description (e.g. Lunch)" required>
-        <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
-        <datalist id="cat-suggestions">
-            <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
-        </datalist>
-        
-        <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
-        
-        <button id="add-btn" onclick="addTransaction()">Add Transaction</button>
+        <form id="tx-form" onsubmit="addTransaction(); return false;">
+            <input type="date" id="t-date" required>
+            
+            <select id="type">
+                <option value="expense">Expense (-)</option>
+                <option value="income">Income (+)</option>
+            </select>
+            
+            <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
+            <datalist id="cat-suggestions">
+                <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
+            </datalist>
+            
+            <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
+            <input type="text" id="desc" placeholder="Description (optional)">
+            
+            <button id="add-btn" type="submit">Add Transaction</button>
+        </form>
     </div>
 
     <div class="list-header">Recent Activity</div>
@@ -265,7 +267,7 @@
                 item.className = 'transaction';
                 item.innerHTML = `
                     <div class="t-left">
-                        <div class="t-desc">${t.desc}</div>
+                        <div class="t-desc">${t.desc || '—'}</div>
                         <div class="t-meta">
                             <span>${displayDate}</span>
                             <span class="t-tag">${displayCat}</span>
@@ -297,14 +299,14 @@
             const category = document.getElementById('category').value;
             const amount = document.getElementById('amount').value;
 
-            if(!desc || !amount || !date) return alert('Please fill all fields');
+            if(!amount || !date) return alert('Please fill date and amount');
 
             const newTx = {
                 id: Date.now(),          // Unique ID
                 createdAt: new Date().toISOString(), // Auto timestamp (Hidden)
                 date,                    // User selected date
                 type,
-                desc,
+                desc: desc || '',
                 category,
                 amount
             };
