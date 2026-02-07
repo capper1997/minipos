@@ -123,6 +123,9 @@
         // --- Helpers ---
         const getSetting = (key) => localStorage.getItem(key);
         
+        // Format amount with commas (e.g., 1234.56 → "1,234.56")
+        const formatAmount = (n) => parseFloat(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
         // Format date for display (e.g., "Oct 26, 2023")
         const formatDate = (dateString) => {
             if(!dateString) return '';
@@ -272,19 +275,19 @@
                     </div>
                     <div class="t-right">
                         <span class="t-amount ${t.type === 'income'?'inc':'exp'}">
-                            ${t.type==='income'?'+':'-'}${amount.toFixed(2)} AED
+                            ${t.type==='income'?'+':'-'}${formatAmount(amount)} AED
                         </span>
                     </div>`;
                 list.appendChild(item);
             });
 
-            document.getElementById('total-inc').innerText = `${inc.toFixed(2)} AED`;
-            document.getElementById('total-exp').innerText = `${exp.toFixed(2)} AED`;
+            document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
+            document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
 
             const balance = inc - exp;
             const balanceEl = document.getElementById('total-balance');
             const balanceCard = document.getElementById('balance-card');
-            balanceEl.innerText = balance < 0 ? `-${Math.abs(balance).toFixed(2)} AED` : `${balance.toFixed(2)} AED`;
+            balanceEl.innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
             balanceCard.classList.toggle('negative', balance < 0);
         }
 
