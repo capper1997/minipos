@@ -46,9 +46,6 @@
         .t-amount.inc { color: #28a745; }
         .t-amount.exp { color: #dc3545; }
         
-        .del-btn { color: #ccc; font-size: 1.2rem; cursor: pointer; padding: 5px; line-height: 1; }
-        .del-btn:hover { color: #dc3545; }
-
         /* Settings Modal */
         #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(2px); }
         .modal-content { background: white; margin: 15% 20px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -65,17 +62,17 @@
     <div class="dashboard">
         <div class="card inc">
             <h3>Income</h3>
-            <p id="total-inc">$0.00</p>
+            <p id="total-inc">0.00 AED</p>
         </div>
         <div class="card exp">
             <h3>Expense</h3>
-            <p id="total-exp">$0.00</p>
+            <p id="total-exp">0.00 AED</p>
         </div>
     </div>
     <div class="dashboard">
         <div class="card balance" id="balance-card">
             <h3>Balance</h3>
-            <p id="total-balance">$0.00</p>
+            <p id="total-balance">0.00 AED</p>
         </div>
     </div>
 
@@ -148,8 +145,8 @@
             const modal = document.getElementById('settings-modal');
             modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
             if(modal.style.display === 'block') {
-                document.getElementById('gh-username').value = getSetting('gh_username') || '';
-                document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
+                document.getElementById('gh-username').value = getSetting('gh_username') || 'safarmansoor';
+                document.getElementById('gh-repo').value = getSetting('gh_repo') || 'wallet-app';
                 document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
                 document.getElementById('gh-token').value = getSetting('gh_token') || '';
             }
@@ -275,20 +272,19 @@
                     </div>
                     <div class="t-right">
                         <span class="t-amount ${t.type === 'income'?'inc':'exp'}">
-                            ${t.type==='income'?'+':'-'}$${amount.toFixed(2)}
+                            ${t.type==='income'?'+':'-'}${amount.toFixed(2)} AED
                         </span>
-                        <div class="del-btn" onclick="removeTransaction(${index})">&times;</div>
                     </div>`;
                 list.appendChild(item);
             });
 
-            document.getElementById('total-inc').innerText = `$${inc.toFixed(2)}`;
-            document.getElementById('total-exp').innerText = `$${exp.toFixed(2)}`;
+            document.getElementById('total-inc').innerText = `${inc.toFixed(2)} AED`;
+            document.getElementById('total-exp').innerText = `${exp.toFixed(2)} AED`;
 
             const balance = inc - exp;
             const balanceEl = document.getElementById('total-balance');
             const balanceCard = document.getElementById('balance-card');
-            balanceEl.innerText = balance < 0 ? `-$${Math.abs(balance).toFixed(2)}` : `$${balance.toFixed(2)}`;
+            balanceEl.innerText = balance < 0 ? `-${Math.abs(balance).toFixed(2)} AED` : `${balance.toFixed(2)} AED`;
             balanceCard.classList.toggle('negative', balance < 0);
         }
 
@@ -319,14 +315,6 @@
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
             setToday();
-        }
-
-        function removeTransaction(index) {
-            if(confirm('Delete this item?')) {
-                transactions.splice(index, 1);
-                updateUI();
-                saveToGitHub();
-            }
         }
 
         // Initialize
