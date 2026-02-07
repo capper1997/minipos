@@ -55,9 +55,10 @@
 
         /* Category Grouping */
         .category-section { margin-bottom: 25px; }
-        .category-item { background: white; padding: 12px 15px; margin-bottom: 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .category-item span:first-child { font-weight: 600; font-size: 0.95rem; }
-        .category-item .cat-amount { font-weight: bold; font-size: 1rem; }
+        #category-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .category-item { background: white; padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .category-item span:first-child { font-weight: 600; font-size: 0.8rem; text-align: center; }
+        .category-item .cat-amount { font-weight: bold; font-size: 0.95rem; margin-top: 4px; }
         .category-item .cat-amount.positive { color: #28a745; }
         .category-item .cat-amount.negative { color: #dc3545; }
     </style>
