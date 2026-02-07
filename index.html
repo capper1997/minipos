@@ -280,8 +280,18 @@
                 }
                 updateUI();
             } catch (e) {
-                showStatus('Offline / Connection Error');
                 console.error(e);
+                try {
+                    const localRes = await fetch('data.json');
+                    if (localRes.ok) {
+                        transactions = await localRes.json();
+                        showStatus('Loaded from local (GitHub unavailable)');
+                        updateUI();
+                        return;
+                    }
+                } catch (e2) { console.error(e2); }
+                showStatus('Offline / Connection Error');
+                updateUI();
             }
         }
 
