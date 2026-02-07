@@ -218,7 +218,7 @@
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
 
             const body = {
-                message: "Update wallet data",
+                message: "Update data [skip ci]",
                 content: content
             };
             if (fileSha) body.sha = fileSha;
