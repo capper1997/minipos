@@ -52,6 +52,14 @@
         .settings-btn { position: fixed; bottom: 25px; right: 25px; background: #333; color: white; border-radius: 50%; width: 56px; height: 56px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 900; }
         
         #status-bar { text-align: center; font-size: 0.75rem; color: #999; margin-bottom: 15px; min-height: 1rem; }
+
+        /* Category Grouping */
+        .category-section { margin-bottom: 25px; }
+        .category-item { background: white; padding: 12px 15px; margin-bottom: 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .category-item span:first-child { font-weight: 600; font-size: 0.95rem; }
+        .category-item .cat-amount { font-weight: bold; font-size: 1rem; }
+        .category-item .cat-amount.positive { color: #28a745; }
+        .category-item .cat-amount.negative { color: #dc3545; }
     </style>
 </head>
 <body>
@@ -74,6 +82,11 @@
             <h3>Balance</h3>
             <p id="total-balance">0.00 AED</p>
         </div>
+    </div>
+
+    <div class="category-section">
+        <div class="list-header">By Category</div>
+        <div id="category-list"></div>
     </div>
 
     <div class="input-group">
@@ -289,6 +302,25 @@
             const balanceCard = document.getElementById('balance-card');
             balanceEl.innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
             balanceCard.classList.toggle('negative', balance < 0);
+
+            // Category totals
+            const categoryTotals = {};
+            transactions.forEach(t => {
+                const cat = (t.category || '').trim() || 'Uncategorized';
+                const amt = parseFloat(t.amount);
+                if (!categoryTotals[cat]) categoryTotals[cat] = 0;
+                categoryTotals[cat] += t.type === 'income' ? amt : -amt;
+            });
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = '';
+            const sortedCats = Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+            sortedCats.forEach(([cat, total]) => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                const isPos = total >= 0;
+                item.innerHTML = `<span>${cat}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
+                categoryList.appendChild(item);
+            });
         }
 
         function addTransaction() {
