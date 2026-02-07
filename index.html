@@ -15,6 +15,8 @@
         .card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card.inc { background: #d4edda; color: #155724; }
         .card.exp { background: #f8d7da; color: #721c24; }
+        .card.balance { background: #cce5ff; color: #004085; }
+        .card.balance.negative { background: #f8d7da; color: #721c24; }
         .card h3 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
         .card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: bold; }
 
@@ -58,7 +60,7 @@
 <body>
 
     <div id="status-bar">Connecting...</div>
-    <h1>GitWallet</h1>
+    <h1>RNU Wallet</h1>
 
     <div class="dashboard">
         <div class="card inc">
@@ -68,6 +70,12 @@
         <div class="card exp">
             <h3>Expense</h3>
             <p id="total-exp">$0.00</p>
+        </div>
+    </div>
+    <div class="dashboard">
+        <div class="card balance" id="balance-card">
+            <h3>Balance</h3>
+            <p id="total-balance">$0.00</p>
         </div>
     </div>
 
@@ -274,6 +282,12 @@
 
             document.getElementById('total-inc').innerText = `$${inc.toFixed(2)}`;
             document.getElementById('total-exp').innerText = `$${exp.toFixed(2)}`;
+
+            const balance = inc - exp;
+            const balanceEl = document.getElementById('total-balance');
+            const balanceCard = document.getElementById('balance-card');
+            balanceEl.innerText = `$${balance.toFixed(2)}`;
+            balanceCard.classList.toggle('negative', balance < 0);
         }
 
         function addTransaction() {
