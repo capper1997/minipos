@@ -302,25 +302,31 @@
             const token = getSetting('gh_token');
             
             showStatus('Saving...');
-            document.getElementById('add-btn').disabled = true;
-            document.getElementById('add-btn').innerText = 'Saving...';
+            const addBtn = document.getElementById('add-btn');
+            if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
+
+            if (!user || !repo || !token) {
+                showStatus('Tap ⚙ to setup GitHub sync');
+                if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
+                return;
+            }
+
+            if (!fileSha) {
+                try {
+                    const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}` } });
+                    if (r.ok) { const d = await r.json(); fileSha = d.sha; }
+                } catch (e) {}
+            }
 
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(transactions))));
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
-
-            const body = {
-                message: "Update data [skip ci]",
-                content: content
-            };
+            const body = { message: "Update data [skip ci]", content: content };
             if (fileSha) body.sha = fileSha;
 
             try {
                 const response = await fetch(url, {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': `token ${token}`, 
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
 
@@ -334,8 +340,7 @@
             } catch (e) {
                 showStatus('Save Error');
             }
-            document.getElementById('add-btn').disabled = false;
-            document.getElementById('add-btn').innerText = 'Add Transaction';
+            if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
         }
 
         function updateUI() {
