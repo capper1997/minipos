@@ -34,6 +34,7 @@ function doLogin() {
     setCurrentUser(u);
     setTrackUser(u);
     showApp();
+    loadFromGitHub(); // Sync data on login
 }
 
 function logout() {
@@ -353,4 +354,3 @@ function addTransaction() {
 
 if (getCurrentUser()) showApp();
 setToday();
-if (getPerm(getCurrentUser(), 'read')) loadFromGitHub();
