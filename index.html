@@ -71,8 +71,18 @@
                 <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
                 <button onclick="saveSettings()">Save & Sync</button>
                 <button id="permissions-btn" onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-top:10px; display:none;">User Permissions</button>
+                <button id="create-user-btn" onclick="toggleSettings(); toggleCreateUser()" style="background:#28a745; margin-top:10px; display:none;">Create User</button>
                 <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
                 <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+            </div>
+        </div>
+        <div id="create-user-modal">
+            <div class="modal-content">
+                <h2>Create New User</h2>
+                <input type="text" id="new-username" placeholder="Username">
+                <input type="password" id="new-password" placeholder="Password">
+                <button onclick="createUser()">Create User</button>
+                <button onclick="toggleCreateUser()" style="background:#eee; color:#333; margin-top:10px;">Cancel</button>
             </div>
         </div>
         <div id="permissions-modal">

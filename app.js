@@ -1,16 +1,24 @@
 let transactions = [];
 let fileSha = null;
 
-const USERS = { safar: 'safar1997', renu: 'renu' };
-const USER_NAMES = ['safar', 'renu'];
-const PERMS = ['read', 'write', 'view', 'delete'];
+// Default users
+const DEFAULT_USERS = { safar: 'safar1997', renu: 'renu' };
+const DEFAULT_ADMINS = ['safar'];
 const DEFAULT_PERMS = { safar: { read: 1, write: 1, view: 1, delete: 1 }, renu: { read: 1, write: 0, view: 1, delete: 0 } };
+
+const getUsers = () => { try { return JSON.parse(localStorage.getItem('wallet_users') || '{}'); } catch(e) { return {}; } };
+const setUsers = (u) => localStorage.setItem('wallet_users', JSON.stringify(u));
+const getUserNames = () => Object.keys({ ...DEFAULT_USERS, ...getUsers() });
+const getPassword = (u) => getUsers()[u] || DEFAULT_USERS[u];
+const isAdminUser = (u) => { try { return (JSON.parse(localStorage.getItem('wallet_admins') || '[]')).includes(u) || DEFAULT_ADMINS.includes(u); } catch(e) { return DEFAULT_ADMINS.includes(u); } };
+const PERMS = ['read', 'write', 'view', 'delete'];
+
 const getPerms = () => { try { return JSON.parse(localStorage.getItem('user_perms') || '{}'); } catch(e) { return {}; } };
 const getPerm = (user, perm) => { if (!user) return 0; const p = getPerms(); return (p[user] && p[user][perm]) || (DEFAULT_PERMS[user] && DEFAULT_PERMS[user][perm]) ? 1 : 0; };
 const setPerms = (p) => localStorage.setItem('user_perms', JSON.stringify(p));
 const getCurrentUser = () => sessionStorage.getItem('wallet_user');
 const setCurrentUser = (u) => { if(u) sessionStorage.setItem('wallet_user', u); else sessionStorage.removeItem('wallet_user'); };
-const isAdmin = () => getCurrentUser() === 'safar';
+const isAdmin = () => isAdminUser(getCurrentUser());
 const getTrackUser = () => {
     if (!isAdmin()) return getCurrentUser() || 'safar';
     return sessionStorage.getItem('track_user') || getCurrentUser() || 'safar';
@@ -21,11 +29,31 @@ function doLogin() {
     const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
     const p = document.getElementById('login-password').value;
     const err = document.getElementById('login-error');
-    if (!USERS[u] || USERS[u] !== p) { err.textContent = 'Invalid username or password'; return; }
+    if (!getUserNames().includes(u) || getPassword(u) !== p) { err.textContent = 'Invalid username or password'; return; }
     err.textContent = '';
     setCurrentUser(u);
     setTrackUser(u);
     showApp();
+}
+
+function createUser() {
+    const u = (document.getElementById('new-username').value || '').trim().toLowerCase();
+    const p = document.getElementById('new-password').value;
+    if (!u || !p) return alert('Please fill username and password');
+    const users = getUsers();
+    if (users[u]) return alert('User already exists');
+    users[u] = p;
+    setUsers(users);
+    setPerms({ ...getPerms(), [u]: { read: 1, write: 1, view: 1, delete: 0 } });
+    alert('User created successfully!');
+    document.getElementById('new-username').value = '';
+    document.getElementById('new-password').value = '';
+    toggleCreateUser();
+}
+
+function toggleCreateUser() {
+    const m = document.getElementById('create-user-modal');
+    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
 }
 
 function logout() {
@@ -47,7 +75,8 @@ function showApp() {
     const sel = document.getElementById('user-select');
     sel.style.display = isAdmin() ? 'block' : 'none';
     document.getElementById('permissions-btn').style.display = isAdmin() ? 'block' : 'none';
-    if (isAdmin()) { sel.innerHTML = USER_NAMES.map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); }
+    document.getElementById('create-user-btn').style.display = isAdmin() ? 'block' : 'none';
+    if (isAdmin()) { sel.innerHTML = getUserNames().map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); }
     else setTrackUser(u);
 }
 function switchTrackUser() {
@@ -72,13 +101,13 @@ function togglePermissions() {
     m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
     if (m.style.display === 'flex') {
         const p = getPerms();
-        const html = `<table class="permissions-table"><thead><tr><th>User</th>${PERMS.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${USER_NAMES.map(u=>`<tr><td>${u}</td>${PERMS.map(perm=>`<td><input type="checkbox" id="perm-${u}-${perm}" ${getPerm(u,perm)?'checked':''}></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        const html = `<table class="permissions-table"><thead><tr><th>User</th>${PERMS.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${getUserNames().map(u=>`<tr><td>${u}</td>${PERMS.map(perm=>`<td><input type="checkbox" id="perm-${u}-${perm}" ${getPerm(u,perm)?'checked':''}></td>`).join('')}</tr>`).join('')}</tbody></table>`;
         document.getElementById('permissions-grid').innerHTML = html;
     }
 }
 function savePermissions() {
     const p = {};
-    USER_NAMES.forEach(u => { p[u] = {}; PERMS.forEach(perm => { p[u][perm] = document.getElementById(`perm-${u}-${perm}`)?.checked ? 1 : 0; }); });
+    getUserNames().forEach(u => { p[u] = {}; PERMS.forEach(perm => { p[u][perm] = document.getElementById(`perm-${u}-${perm}`)?.checked ? 1 : 0; }); });
     setPerms(p);
     const u = getCurrentUser();
     document.getElementById('add-transaction-form').style.display = getPerm(u, 'write') ? 'block' : 'none';
