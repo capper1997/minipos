@@ -136,11 +136,19 @@ function showApp() {
     document.getElementById('add-transaction-form').style.display = getPerm(u, 'write') ? 'block' : 'none';
     document.getElementById('main-content').style.display = getPerm(u, 'view') ? 'block' : 'none';
     document.getElementById('no-permission-msg').style.display = getPerm(u, 'view') ? 'none' : 'block';
+    
+    // Show user select and Users button only for admin
     const sel = document.getElementById('user-select');
     sel.style.display = isAdmin() ? 'block' : 'none';
     document.getElementById('permissions-btn').style.display = isAdmin() ? 'block' : 'none';
-    if (isAdmin()) { sel.innerHTML = getUserNames().map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); }
-    else setTrackUser(u);
+    document.getElementById('nav-users').style.display = isAdmin() ? 'block' : 'none';
+    
+    if (isAdmin()) { 
+        sel.innerHTML = getUserNames().map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); 
+    } else {
+        // Non-admin users see only their own transactions
+        setTrackUser(u);
+    }
 }
 function switchTrackUser() {
     if (!isAdmin()) return;
