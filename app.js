@@ -38,6 +38,13 @@ function doLogin() {
 
 function logout() {
     setCurrentUser('');
+    transactions = []; // Clear transactions on logout
+    // Clear UI
+    document.getElementById('history-list').innerHTML = '';
+    document.getElementById('total-asset').innerText = '0.00 AED';
+    document.getElementById('total-inc').innerText = '0.00 AED';
+    document.getElementById('total-exp').innerText = '0.00 AED';
+    document.getElementById('total-balance').innerText = '0.00 AED';
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
     document.getElementById('login-screen').classList.remove('hidden');
