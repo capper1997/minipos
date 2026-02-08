@@ -83,19 +83,22 @@
                     <button onclick="clearUserForm()" style="flex: 1; background: #6c757d;">Clear</button>
                 </div>
             </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">GitHub Setup</h3>
+                <input type="text" id="gh-username" placeholder="GitHub Username" onchange="saveGhSetting()">
+                <input type="text" id="gh-repo" placeholder="Repository Name" onchange="saveGhSetting()">
+                <input type="text" id="gh-filename" placeholder="Filename" value="data.json" onchange="saveGhSetting()">
+                <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)" onchange="saveGhSetting()">
+                <button onclick="loadFromGitHub()" style="margin-top: 10px;">Sync Now</button>
+            </div>
         </div>
         <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>
         <div id="settings-modal">
             <div class="modal-content">
-                <h2>GitHub Setup</h2>
-                <p style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Enter your details to sync data.</p>
-                <input type="text" id="gh-username" placeholder="GitHub Username">
-                <input type="text" id="gh-repo" placeholder="Repository Name">
-                <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
-                <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
-                <button onclick="saveSettings()">Save & Sync</button>
-                <button id="permissions-btn" onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-top:10px; display:none;">User Permissions</button>
+                <h2>Settings</h2>
+                <button id="permissions-btn" onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-bottom:10px; display:none;">User Permissions</button>
+                <button onclick="showPage('users')" style="margin-bottom:10px;">GitHub & Users</button>
                 <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
                 <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
             </div>

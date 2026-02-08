@@ -50,7 +50,24 @@ function showPage(page) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
     document.getElementById('nav-' + page).classList.add('active');
-    if (page === 'users') renderUserList();
+    if (page === 'users') {
+        renderUserList();
+        loadGhSettings();
+    }
+}
+
+function loadGhSettings() {
+    document.getElementById('gh-username').value = getSetting('gh_username') || '';
+    document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
+    document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
+    document.getElementById('gh-token').value = getSetting('gh_token') || '';
+}
+
+function saveGhSetting() {
+    localStorage.setItem('gh_username', document.getElementById('gh-username').value);
+    localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
+    localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
+    localStorage.setItem('gh_token', document.getElementById('gh-token').value);
 }
 
 function renderUserList() {
@@ -168,8 +185,8 @@ function toggleSettings() {
     const modal = document.getElementById('settings-modal');
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     if(modal.style.display === 'block') {
-        document.getElementById('gh-username').value = getSetting('gh_username') || 'safarmansoor';
-        document.getElementById('gh-repo').value = getSetting('gh_repo') || 'wallet-app';
+        document.getElementById('gh-username').value = getSetting('gh_username') || '';
+        document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
         document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
         document.getElementById('gh-token').value = getSetting('gh_token') || '';
     }
