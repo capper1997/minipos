@@ -48,6 +48,11 @@ button:disabled { background: #ccc; cursor: not-allowed; }
 .category-section { margin-bottom: 25px; }
 #category-list { display: flex; flex-wrap: wrap; gap: 10px; }
 .category-item { background: white; padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+
+#month-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+.month-card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 100px; }
+.month-card h3 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
+.month-card p { margin: 5px 0 0; font-size: 1.1rem; font-weight: bold; }
 .category-item span:first-child { font-weight: 600; font-size: 0.8rem; text-align: center; }
 .category-item .cat-amount { font-weight: bold; font-size: 0.95rem; margin-top: 4px; }
 .category-item .cat-amount.positive { color: #28a745; }

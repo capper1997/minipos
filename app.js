@@ -246,11 +246,11 @@ function updateUI() {
     ml.innerHTML = '';
     Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0])).forEach(([month, total]) => {
         const it = document.createElement('div');
-        it.className = 'category-item';
+        it.className = 'month-card';
         const isPos = total >= 0;
         const [y, m] = month.split('-');
         const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        it.innerHTML = `<span>${monthName}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
+        it.innerHTML = `<h3>${monthName}</h3><p class="${isPos ? '' : ''}" style="color: ${isPos ? '#28a745' : '#dc3545'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</p>`;
         ml.appendChild(it);
     });
 }
