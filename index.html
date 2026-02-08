@@ -25,8 +25,13 @@
         <div id="main-content">
         <header class="app-header">
             <h1>Wallet Tracker</h1>
+            <nav class="app-nav">
+                <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+                <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
+            </nav>
             <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
         </header>
+        <div id="page-dashboard" class="page active">
         <div class="dashboard">
             <div class="card asset"><h3>Asset</h3><p id="total-asset">0.00 AED</p></div>
             <div class="card inc"><h3>Income</h3><p id="total-inc">0.00 AED</p></div>
@@ -34,14 +39,6 @@
         </div>
         <div class="dashboard">
             <div class="card balance" id="balance-card"><h3>Cash Balance</h3><p id="total-balance">0.00 AED</p></div>
-        </div>
-        <div class="category-section">
-            <div class="list-header">By Category</div>
-            <div id="category-list"></div>
-        </div>
-        <div class="category-section">
-            <div class="list-header">By Month</div>
-            <div id="month-list"></div>
         </div>
         <div class="input-group" id="add-transaction-form">
             <form id="tx-form" onsubmit="addTransaction(); return false;">
@@ -62,6 +59,16 @@
         </div>
         <div class="list-header">Recent Activity</div>
         <div id="history-list"></div>
+        </div>
+        <div id="page-reports" class="page">
+        <div class="category-section">
+            <div class="list-header">By Category</div>
+            <div id="category-list"></div>
+        </div>
+        <div class="category-section">
+            <div class="list-header">By Month</div>
+            <div id="month-list"></div>
+        </div>
         </div>
         <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>

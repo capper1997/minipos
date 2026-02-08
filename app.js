@@ -65,6 +65,13 @@ function logout() {
     toggleSettings();
 }
 
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('nav-' + page).classList.add('active');
+}
+
 function showApp() {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.add('visible');
