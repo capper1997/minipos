@@ -1,0 +1,23 @@
+---
+description: Minimize token usage when editing wallet-app
+alwaysApply: true
+---
+
+# Wallet App: Minimal Token Usage
+
+## File Structure
+- `index.html` - HTML structure only (~70 lines)
+- `styles.css` - All CSS
+- `app.js` - All JavaScript logic
+
+## When Adding Features
+
+1. **Target only the file you need**: Use `@app.js` for logic, `@styles.css` for styling, `@index.html` for structure.
+2. **Don't read the whole codebase**: Use grep/search to find the exact function/section, then edit only that.
+3. **Make minimal edits**: Change the smallest possible block. Avoid rewrites.
+
+## Quick Reference
+- Dashboard UI: `index.html` + `styles.css`
+- Transaction logic: `app.js` → `updateUI()`, `addTransaction()`
+- GitHub sync: `app.js` → `loadFromGitHub()`, `saveToGitHub()`
+- Auth: `app.js` → `doLogin()`, `showApp()`

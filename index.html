@@ -5,78 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="GitWallet">
-    <title>GitHub Wallet</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f4f7; margin: 0; padding: 20px; color: #333; padding-bottom: 100px; }
-        h1 { text-align: center; font-size: 1.2rem; color: #555; margin-bottom: 20px; }
-        
-        /* Dashboard */
-        .dashboard { display: flex; gap: 10px; margin-bottom: 20px; }
-        .card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card.asset { background: #fff3cd; color: #856404; }
-        .card.inc { background: #d4edda; color: #155724; }
-        .card.exp { background: #f8d7da; color: #721c24; }
-        .card.balance { background: #cce5ff; color: #004085; }
-        .card.balance.negative { background: #f8d7da; color: #721c24; }
-        .card h3 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
-        .card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: bold; }
-
-        /* Input Form */
-        .input-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
-        input:focus, select:focus { outline: none; border-color: #007bff; background: #fff; }
-        
-        /* New Date Input Styling */
-        input[type="date"] { font-family: inherit; }
-
-        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        button:active { background: #0056b3; transform: scale(0.98); }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* List Items */
-        .list-header { font-size: 0.9rem; font-weight: bold; color: #777; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .transaction { background: white; padding: 15px; margin-bottom: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        
-        .t-left { display: flex; flex-direction: column; gap: 4px; }
-        .t-desc { font-weight: 600; font-size: 1rem; }
-        .t-meta { font-size: 0.8rem; color: #888; display: flex; gap: 8px; align-items: center; }
-        .t-tag { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
-        
-        .t-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;}
-        .t-amount { font-weight: bold; font-size: 1.1rem; }
-        .t-amount.asset { color: #d4a017; }
-        .t-amount.inc { color: #28a745; }
-        .t-amount.exp { color: #dc3545; }
-        
-        /* Settings Modal */
-        #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(2px); }
-        .modal-content { background: white; margin: 15% 20px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .settings-btn { position: fixed; bottom: 25px; right: 25px; background: #333; color: white; border-radius: 50%; width: 56px; height: 56px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 900; }
-        
-        #status-bar { text-align: center; font-size: 0.75rem; color: #999; margin-bottom: 15px; min-height: 1rem; }
-
-        /* Category Grouping */
-        .category-section { margin-bottom: 25px; }
-        #category-list { display: flex; flex-wrap: wrap; gap: 10px; }
-        .category-item { background: white; padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .category-item span:first-child { font-weight: 600; font-size: 0.8rem; text-align: center; }
-        .category-item .cat-amount { font-weight: bold; font-size: 0.95rem; margin-top: 4px; }
-        .category-item .cat-amount.positive { color: #28a745; }
-        .category-item .cat-amount.negative { color: #dc3545; }
-
-        /* Login */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f7; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 2000; }
-        #login-screen.hidden { display: none; }
-        .login-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 320px; }
-        .login-box h2 { margin: 0 0 20px; text-align: center; font-size: 1.3rem; color: #333; }
-        .login-box input { margin-bottom: 15px; }
-        .login-error { color: #dc3545; font-size: 0.85rem; margin-bottom: 10px; text-align: center; }
-        #app { display: none; }
-        #app.visible { display: block; }
-    </style>
+    <title>RNU Wallet</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div id="login-screen">
         <div class="login-box">
             <h2>RNU Wallet</h2>
@@ -88,364 +20,58 @@
             </form>
         </div>
     </div>
-
     <div id="app">
-    <div id="status-bar">Connecting...</div>
-    <h1>RNU Wallet</h1>
-
-    <div class="dashboard">
-        <div class="card asset">
-            <h3>Asset</h3>
-            <p id="total-asset">0.00 AED</p>
+        <div id="status-bar">Connecting...</div>
+        <header class="app-header">
+            <h1>RNU Wallet</h1>
+            <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
+        </header>
+        <div class="dashboard">
+            <div class="card asset"><h3>Asset</h3><p id="total-asset">0.00 AED</p></div>
+            <div class="card inc"><h3>Income</h3><p id="total-inc">0.00 AED</p></div>
+            <div class="card exp"><h3>Expense</h3><p id="total-exp">0.00 AED</p></div>
         </div>
-        <div class="card inc">
-            <h3>Income</h3>
-            <p id="total-inc">0.00 AED</p>
+        <div class="dashboard">
+            <div class="card balance" id="balance-card"><h3>Cash Balance</h3><p id="total-balance">0.00 AED</p></div>
         </div>
-        <div class="card exp">
-            <h3>Expense</h3>
-            <p id="total-exp">0.00 AED</p>
+        <div class="category-section">
+            <div class="list-header">By Category</div>
+            <div id="category-list"></div>
         </div>
-    </div>
-    <div class="dashboard">
-        <div class="card balance" id="balance-card">
-            <h3>Cash Balance</h3>
-            <p id="total-balance">0.00 AED</p>
+        <div class="input-group" id="add-transaction-form">
+            <form id="tx-form" onsubmit="addTransaction(); return false;">
+                <input type="date" id="t-date" required>
+                <select id="type">
+                    <option value="asset">Asset (-)</option>
+                    <option value="income">Income (+)</option>
+                    <option value="expense">Expense (-)</option>
+                </select>
+                <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
+                <datalist id="cat-suggestions">
+                    <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
+                </datalist>
+                <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
+                <input type="text" id="desc" placeholder="Description (optional)">
+                <button id="add-btn" type="submit">Add Transaction</button>
+            </form>
         </div>
-    </div>
-
-    <div class="category-section">
-        <div class="list-header">By Category</div>
-        <div id="category-list"></div>
-    </div>
-
-    <div class="input-group" id="add-transaction-form">
-        <form id="tx-form" onsubmit="addTransaction(); return false;">
-            <input type="date" id="t-date" required>
-            
-            <select id="type">
-                <option value="asset">Asset (+)</option>
-                <option value="income">Income (+)</option>
-                <option value="expense">Expense (-)</option>
-            </select>
-            
-            <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
-            <datalist id="cat-suggestions">
-                <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
-            </datalist>
-            
-            <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
-            <input type="text" id="desc" placeholder="Description (optional)">
-            
-            <button id="add-btn" type="submit">Add Transaction</button>
-        </form>
-    </div>
-
-    <div class="list-header">Recent Activity</div>
-    <div id="history-list">
-        </div>
-
-    <div class="settings-btn" onclick="toggleSettings()">⚙</div>
-
-    <div id="settings-modal">
-        <div class="modal-content">
-            <h2>GitHub Setup</h2>
-            <p style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Enter your details to sync data.</p>
-            <input type="text" id="gh-username" placeholder="GitHub Username">
-            <input type="text" id="gh-repo" placeholder="Repository Name">
-            <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
-            <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
-            <button onclick="saveSettings()">Save & Sync</button>
-            <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
-            <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+        <div class="list-header">Recent Activity</div>
+        <div id="history-list"></div>
+        <div class="settings-btn" onclick="toggleSettings()">⚙</div>
+        <div id="settings-modal">
+            <div class="modal-content">
+                <h2>GitHub Setup</h2>
+                <p style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Enter your details to sync data.</p>
+                <input type="text" id="gh-username" placeholder="GitHub Username">
+                <input type="text" id="gh-repo" placeholder="Repository Name">
+                <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
+                <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
+                <button onclick="saveSettings()">Save & Sync</button>
+                <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
+                <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+            </div>
         </div>
     </div>
-
-    </div><!-- end #app -->
-
-    <script>
-        let transactions = [];
-        let fileSha = null;
-
-        // --- Auth ---
-        const USERS = { safar: 'safar1997', renu: 'renu' };
-        const getCurrentUser = () => sessionStorage.getItem('wallet_user');
-        const setCurrentUser = (u) => { if(u) sessionStorage.setItem('wallet_user', u); else sessionStorage.removeItem('wallet_user'); };
-
-        function doLogin() {
-            const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
-            const p = document.getElementById('login-password').value;
-            const err = document.getElementById('login-error');
-            if (!USERS[u] || USERS[u] !== p) {
-                err.textContent = 'Invalid username or password';
-                return;
-            }
-            err.textContent = '';
-            setCurrentUser(u);
-            showApp();
-        }
-
-        function logout() {
-            setCurrentUser('');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('app').classList.remove('visible');
-            toggleSettings();
-        }
-
-        function showApp() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app').classList.add('visible');
-            const isRenu = getCurrentUser() === 'renu';
-            document.getElementById('add-transaction-form').style.display = isRenu ? 'none' : 'block';
-        }
-
-        // --- Helpers ---
-        const getSetting = (key) => localStorage.getItem(key);
-        
-        // Format amount with commas (e.g., 1234.56 → "1,234.56")
-        const formatAmount = (n) => parseFloat(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        
-        // Format date for display (e.g., "Oct 26, 2023")
-        const formatDate = (dateString) => {
-            if(!dateString) return '';
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('en-US', options);
-        };
-
-        // Set default date input to Today
-        const setToday = () => {
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            document.getElementById('t-date').value = `${year}-${month}-${day}`;
-        };
-
-        // --- Core Functions ---
-
-        function toggleSettings() {
-            const modal = document.getElementById('settings-modal');
-            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-            if(modal.style.display === 'block') {
-                document.getElementById('gh-username').value = getSetting('gh_username') || 'safarmansoor';
-                document.getElementById('gh-repo').value = getSetting('gh_repo') || 'wallet-app';
-                document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
-                document.getElementById('gh-token').value = getSetting('gh_token') || '';
-            }
-        }
-
-        function saveSettings() {
-            localStorage.setItem('gh_username', document.getElementById('gh-username').value);
-            localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
-            localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
-            localStorage.setItem('gh_token', document.getElementById('gh-token').value);
-            toggleSettings();
-            loadFromGitHub();
-        }
-
-        function showStatus(msg) { document.getElementById('status-bar').innerText = msg; }
-
-        async function loadFromGitHub() {
-            const user = getSetting('gh_username');
-            const repo = getSetting('gh_repo');
-            const file = getSetting('gh_filename');
-            const token = getSetting('gh_token');
-
-            if (!user || !repo || !token) {
-                showStatus('Tap ⚙ to setup GitHub sync');
-                return;
-            }
-
-            showStatus('Fetching data...');
-            const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-
-                if (response.status === 404) {
-                    showStatus('New file will be created on first add.');
-                    transactions = [];
-                } else if (response.ok) {
-                    const data = await response.json();
-                    fileSha = data.sha;
-                    const content = decodeURIComponent(escape(atob(data.content))); // Decode Base64
-                    transactions = JSON.parse(content);
-                    showStatus('Synced with GitHub');
-                } else {
-                    showStatus('Error fetching data');
-                }
-                updateUI();
-            } catch (e) {
-                console.error(e);
-                try {
-                    const localRes = await fetch('data.json');
-                    if (localRes.ok) {
-                        transactions = await localRes.json();
-                        showStatus('Loaded from local (GitHub unavailable)');
-                        updateUI();
-                        return;
-                    }
-                } catch (e2) { console.error(e2); }
-                showStatus('Offline / Connection Error');
-                updateUI();
-            }
-        }
-
-        async function saveToGitHub() {
-            const user = getSetting('gh_username');
-            const repo = getSetting('gh_repo');
-            const file = getSetting('gh_filename');
-            const token = getSetting('gh_token');
-            
-            showStatus('Saving...');
-            const addBtn = document.getElementById('add-btn');
-            if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
-
-            if (!user || !repo || !token) {
-                showStatus('Tap ⚙ to setup GitHub sync');
-                if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
-                return;
-            }
-
-            if (!fileSha) {
-                try {
-                    const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}` } });
-                    if (r.ok) { const d = await r.json(); fileSha = d.sha; }
-                } catch (e) {}
-            }
-
-            const content = btoa(unescape(encodeURIComponent(JSON.stringify(transactions))));
-            const url = `https://api.github.com/repos/${user}/${repo}/contents/${file}`;
-            const body = { message: "Update data [skip ci]", content: content };
-            if (fileSha) body.sha = fileSha;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    fileSha = data.content.sha;
-                    showStatus('Saved successfully!');
-                } else {
-                    showStatus('Save Failed! Check Settings.');
-                }
-            } catch (e) {
-                showStatus('Save Error');
-            }
-            if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
-        }
-
-        function updateUI() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            let asset = 0, inc = 0, exp = 0;
-
-            // Sort by Date (Newest first)
-            transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            transactions.forEach((t, index) => {
-                const amount = parseFloat(t.amount);
-                if(t.type === 'asset') asset += amount;
-                else if(t.type === 'income') inc += amount;
-                else exp += amount;
-
-                // Handle old data that might not have a category or date
-                const displayDate = t.date ? formatDate(t.date) : 'No Date';
-                const displayCat = t.category ? t.category : 'Uncategorized';
-                const typeClass = t.type === 'asset' ? 'asset' : (t.type === 'income' ? 'inc' : 'exp');
-                const sign = (t.type === 'asset' || t.type === 'income') ? '+' : '-';
-
-                const item = document.createElement('div');
-                item.className = 'transaction';
-                item.innerHTML = `
-                    <div class="t-left">
-                        <div class="t-desc">${t.desc || '—'}</div>
-                        <div class="t-meta">
-                            <span>${displayDate}</span>
-                            <span class="t-tag">${displayCat}</span>
-                        </div>
-                    </div>
-                    <div class="t-right">
-                        <span class="t-amount ${typeClass}">
-                            ${sign}${formatAmount(amount)} AED
-                        </span>
-                    </div>`;
-                list.appendChild(item);
-            });
-
-            document.getElementById('total-asset').innerText = `${formatAmount(asset)} AED`;
-            document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
-            document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
-
-            const balance = inc - exp;
-            const balanceEl = document.getElementById('total-balance');
-            const balanceCard = document.getElementById('balance-card');
-            balanceEl.innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
-            balanceCard.classList.toggle('negative', balance < 0);
-
-            // Category totals
-            const categoryTotals = {};
-            transactions.forEach(t => {
-                const cat = (t.category || '').trim() || 'Uncategorized';
-                const amt = parseFloat(t.amount);
-                if (!categoryTotals[cat]) categoryTotals[cat] = 0;
-                categoryTotals[cat] += (t.type === 'asset' || t.type === 'income') ? amt : -amt;
-            });
-            const categoryList = document.getElementById('category-list');
-            categoryList.innerHTML = '';
-            const sortedCats = Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
-            sortedCats.forEach(([cat, total]) => {
-                const item = document.createElement('div');
-                item.className = 'category-item';
-                const isPos = total >= 0;
-                item.innerHTML = `<span>${cat}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
-                categoryList.appendChild(item);
-            });
-        }
-
-        function addTransaction() {
-            const date = document.getElementById('t-date').value;
-            const type = document.getElementById('type').value;
-            const desc = document.getElementById('desc').value;
-            const category = document.getElementById('category').value;
-            const amount = document.getElementById('amount').value;
-
-            if(!amount || !date) return alert('Please fill date and amount');
-
-            const newTx = {
-                id: Date.now(),          // Unique ID
-                createdAt: new Date().toISOString(), // Auto timestamp (Hidden)
-                date,                    // User selected date
-                type,
-                desc: desc || '',
-                category,
-                amount
-            };
-
-            transactions.push(newTx); // Add to local list
-            updateUI();               // Refresh screen
-            saveToGitHub();           // Send to Cloud
-            
-            // Clear inputs (reset date to today)
-            document.getElementById('desc').value = '';
-            document.getElementById('amount').value = '';
-            setToday();
-        }
-
-        // Initialize
-        if (getCurrentUser()) {
-            showApp();
-        }
-        setToday();
-        loadFromGitHub();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
