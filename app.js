@@ -46,6 +46,7 @@ function showApp() {
     document.getElementById('no-permission-msg').style.display = getPerm(u, 'view') ? 'none' : 'block';
     const sel = document.getElementById('user-select');
     sel.style.display = isAdmin() ? 'block' : 'none';
+    document.getElementById('permissions-btn').style.display = isAdmin() ? 'block' : 'none';
     if (isAdmin()) { sel.innerHTML = USER_NAMES.map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); }
     else setTrackUser(u);
 }
