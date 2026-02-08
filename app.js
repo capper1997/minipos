@@ -128,15 +128,6 @@ async function loadFromGitHub() {
         } else showStatus('Error fetching data');
         updateUI();
     } catch (e) {
-        try {
-            const lr = await fetch('data.json');
-            if (lr.ok) {
-                let raw = await lr.json();
-                transactions = Array.isArray(raw) ? raw : Object.values(raw).flat();
-                transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
-                showStatus('Loaded from local (GitHub unavailable)'); updateUI(); return;
-            }
-        } catch(e2) {}
         showStatus('Offline / Connection Error');
         updateUI();
     }
@@ -148,9 +139,19 @@ async function saveToGitHub() {
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
     if (!user || !repo || !token) { showStatus('Tap ⚙ to setup GitHub sync'); if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; } return; }
-    if (!fileSha) {
-        try { const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}` } }); if (r.ok) { const d = await r.json(); fileSha = d.sha; } } catch(e) {}
-    }
+    try {
+        const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}` } });
+        if (r.ok) {
+            const d = await r.json();
+            fileSha = d.sha;
+            let remote = JSON.parse(decodeURIComponent(escape(atob(d.content))));
+            remote = Array.isArray(remote) ? remote : Object.values(remote).flat();
+            const byId = {};
+            remote.forEach(t => { byId[t.id] = t; });
+            transactions.forEach(t => { byId[t.id] = t; });
+            transactions = Object.values(byId);
+        }
+    } catch(e) {}
     const body = { message: "Update data [skip ci]", content: btoa(unescape(encodeURIComponent(JSON.stringify(transactions)))) };
     if (fileSha) body.sha = fileSha;
     try {
