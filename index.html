@@ -28,6 +28,7 @@
             <nav class="app-nav">
                 <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
                 <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
+                <button id="nav-users" class="nav-btn" onclick="showPage('users')">Users</button>
             </nav>
             <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
         </header>
@@ -70,6 +71,19 @@
             <div id="month-list"></div>
         </div>
         </div>
+        <div id="page-users" class="page">
+            <div class="list-header">User List</div>
+            <div id="user-list"></div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">Add/Edit User</h3>
+                <input type="text" id="user-username" placeholder="Username">
+                <input type="password" id="user-password" placeholder="Password">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="saveUser()" style="flex: 1;">Save User</button>
+                    <button onclick="clearUserForm()" style="flex: 1; background: #6c757d;">Clear</button>
+                </div>
+            </div>
+        </div>
         <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>
         <div id="settings-modal">
@@ -82,18 +96,8 @@
                 <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
                 <button onclick="saveSettings()">Save & Sync</button>
                 <button id="permissions-btn" onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-top:10px; display:none;">User Permissions</button>
-                <button id="create-user-btn" onclick="toggleSettings(); toggleCreateUser()" style="background:#28a745; margin-top:10px; display:none;">Create User</button>
                 <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
                 <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
-            </div>
-        </div>
-        <div id="create-user-modal">
-            <div class="modal-content">
-                <h2>Create New User</h2>
-                <input type="text" id="new-username" placeholder="Username">
-                <input type="password" id="new-password" placeholder="Password">
-                <button onclick="createUser()">Create User</button>
-                <button onclick="toggleCreateUser()" style="background:#eee; color:#333; margin-top:10px;">Cancel</button>
             </div>
         </div>
         <div id="permissions-modal">

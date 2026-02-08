@@ -36,26 +36,6 @@ function doLogin() {
     showApp();
 }
 
-function createUser() {
-    const u = (document.getElementById('new-username').value || '').trim().toLowerCase();
-    const p = document.getElementById('new-password').value;
-    if (!u || !p) return alert('Please fill username and password');
-    const users = getUsers();
-    if (users[u]) return alert('User already exists');
-    users[u] = p;
-    setUsers(users);
-    setPerms({ ...getPerms(), [u]: { read: 1, write: 1, view: 1, delete: 0 } });
-    alert('User created successfully!');
-    document.getElementById('new-username').value = '';
-    document.getElementById('new-password').value = '';
-    toggleCreateUser();
-}
-
-function toggleCreateUser() {
-    const m = document.getElementById('create-user-modal');
-    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-}
-
 function logout() {
     setCurrentUser('');
     document.getElementById('login-username').value = '';
@@ -70,6 +50,66 @@ function showPage(page) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
     document.getElementById('nav-' + page).classList.add('active');
+    if (page === 'users') renderUserList();
+}
+
+function renderUserList() {
+    const list = document.getElementById('user-list');
+    const users = getUserNames();
+    list.innerHTML = '';
+    users.forEach(u => {
+        const isAdmin = isAdminUser(u);
+        const isDefault = DEFAULT_USERS[u];
+        const div = document.createElement('div');
+        div.className = 'transaction';
+        div.innerHTML = `
+            <div class="t-left">
+                <div class="t-desc">${u} ${isAdmin ? '(Admin)' : ''} ${isDefault ? '(Default)' : ''}</div>
+            </div>
+            <div class="t-right">
+                <button onclick="editUser('${u}')" style="padding: 8px 15px; width: auto; font-size: 0.85rem; margin-right: 5px;">Edit</button>
+                <button onclick="deleteUser('${u}')" ${isDefault ? 'disabled' : ''} style="padding: 8px 15px; width: auto; font-size: 0.85rem; background: ${isDefault ? '#ccc' : '#dc3545'};">Delete</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function editUser(username) {
+    document.getElementById('user-username').value = username;
+    document.getElementById('user-password').value = '';
+}
+
+function deleteUser(username) {
+    if (!confirm('Delete user ' + username + '?')) return;
+    const users = getUsers();
+    delete users[username];
+    setUsers(users);
+    const perms = getPerms();
+    delete perms[username];
+    setPerms(perms);
+    renderUserList();
+    alert('User deleted!');
+}
+
+function saveUser() {
+    const username = (document.getElementById('user-username').value || '').trim().toLowerCase();
+    const password = document.getElementById('user-password').value;
+    if (!username || !password) return alert('Please fill username and password');
+    const users = getUsers();
+    users[username] = password;
+    setUsers(users);
+    if (!getPerms()[username]) {
+        setPerms({ ...getPerms(), [username]: { read: 1, write: 1, view: 1, delete: 0 } });
+    }
+    clearUserForm();
+    renderUserList();
+    alert('User saved!');
+}
+
+function clearUserForm() {
+    document.getElementById('user-username').value = '';
+    document.getElementById('user-password').value = '';
 }
 
 function showApp() {
@@ -82,7 +122,6 @@ function showApp() {
     const sel = document.getElementById('user-select');
     sel.style.display = isAdmin() ? 'block' : 'none';
     document.getElementById('permissions-btn').style.display = isAdmin() ? 'block' : 'none';
-    document.getElementById('create-user-btn').style.display = isAdmin() ? 'block' : 'none';
     if (isAdmin()) { sel.innerHTML = getUserNames().map(un => `<option value="${un}" ${un === getTrackUser() ? 'selected' : ''}>${un}</option>`).join(''); }
     else setTrackUser(u);
 }
