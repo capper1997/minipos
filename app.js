@@ -85,7 +85,7 @@ async function loadFromGitHub() {
             fileSha = d.sha;
             let raw = JSON.parse(decodeURIComponent(escape(atob(d.content))));
             transactions = Array.isArray(raw) ? raw : Object.values(raw).flat();
-            transactions.forEach(t => { if (!t.user) t.user = 'safar'; });
+            transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
             showStatus('Synced with GitHub');
         } else showStatus('Error fetching data');
         updateUI();
@@ -95,7 +95,7 @@ async function loadFromGitHub() {
             if (lr.ok) {
                 let raw = await lr.json();
                 transactions = Array.isArray(raw) ? raw : Object.values(raw).flat();
-                transactions.forEach(t => { if (!t.user) t.user = 'safar'; });
+                transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
                 showStatus('Loaded from local (GitHub unavailable)'); updateUI(); return;
             }
         } catch(e2) {}
@@ -125,7 +125,7 @@ async function saveToGitHub() {
 
 function updateUI() {
     const trackUser = getTrackUser();
-    const filtered = transactions.filter(t => (t.user || 'safar') === trackUser);
+    const filtered = transactions.filter(t => (t.user || 'renu') === trackUser);
     document.getElementById('history-list').innerHTML = '';
     let asset = 0, inc = 0, exp = 0;
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
