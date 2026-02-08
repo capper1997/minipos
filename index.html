@@ -22,6 +22,7 @@
     </div>
     <div id="app">
         <div id="status-bar">Connecting...</div>
+        <div id="main-content">
         <header class="app-header">
             <h1>RNU Wallet</h1>
             <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
@@ -57,6 +58,8 @@
         </div>
         <div class="list-header">Recent Activity</div>
         <div id="history-list"></div>
+        </div>
+        <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>
         <div id="settings-modal">
             <div class="modal-content">
@@ -67,8 +70,18 @@
                 <input type="text" id="gh-filename" placeholder="Filename (e.g. data.json)" value="data.json">
                 <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)">
                 <button onclick="saveSettings()">Save & Sync</button>
+                <button onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-top:10px;">User Permissions</button>
                 <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
                 <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+            </div>
+        </div>
+        <div id="permissions-modal">
+            <div class="modal-content">
+                <h2>User Permissions</h2>
+                <p style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Set read, write, view, delete for each user.</p>
+                <div id="permissions-grid"></div>
+                <button onclick="savePermissions()">Save Permissions</button>
+                <button onclick="togglePermissions()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
             </div>
         </div>
     </div>
