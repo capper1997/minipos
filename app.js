@@ -233,6 +233,26 @@ function updateUI() {
         it.innerHTML = `<span>${cat}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
         cl.appendChild(it);
     });
+
+    // By Month
+    const monthTotals = {};
+    filtered.forEach(t => {
+        const month = t.date ? t.date.substring(0, 7) : 'Unknown';
+        const amt = parseFloat(t.amount);
+        if (!monthTotals[month]) monthTotals[month] = 0;
+        monthTotals[month] += (t.type === 'asset' || t.type === 'income') ? amt : -amt;
+    });
+    const ml = document.getElementById('month-list');
+    ml.innerHTML = '';
+    Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0])).forEach(([month, total]) => {
+        const it = document.createElement('div');
+        it.className = 'category-item';
+        const isPos = total >= 0;
+        const [y, m] = month.split('-');
+        const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        it.innerHTML = `<span>${monthName}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
+        ml.appendChild(it);
+    });
 }
 
 function removeTransaction(idx) {
