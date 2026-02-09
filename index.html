@@ -24,13 +24,14 @@
         <div id="status-bar">Connecting...</div>
         <div id="main-content">
         <header class="app-header">
-            <h1>Wallet Tracker</h1>
+            <h1>Wallet</h1>
             <nav class="app-nav">
+                <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
                 <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
                 <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
                 <button id="nav-users" class="nav-btn" onclick="showPage('users')" style="display:none;">Users</button>
             </nav>
-            <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
+            
         </header>
         <div id="page-dashboard" class="page active">
         <div class="dashboard">
