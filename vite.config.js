@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-   base: 'minipos', // Change this to your actual GitHub repo name
+   base: '/minipos/', // Change this to your actual GitHub repo name
   plugins: [
     vue(),
     VitePWA({
