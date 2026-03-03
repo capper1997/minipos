@@ -1,0 +1,29 @@
+{
+  "name": "pos-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+     "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+    
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "bootstrap": "^5.3.8",
+    "vue": "^3.5.12",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "autoprefixer": "^10.4.27",
+    "gh-pages": "^6.3.0",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1",
+    "vite": "^5.4.10",
+    "vite-plugin-pwa": "^1.2.0"
+  }
+}

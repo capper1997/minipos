@@ -3,7 +3,7 @@ name: Deploy Web App
 on:
   push:
     branches: ["main"]
-    # THE MAGIC PART: This ignores your data file!
+    # THE MAGIC PART: This ignores your data file?
     paths-ignore:
       - 'data.json'
 
